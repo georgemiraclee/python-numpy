@@ -12,18 +12,27 @@ def transient_response(R, C, Vin, t):
     
     return Vout
 
-def calculate_performance_metrics(Vout, t):
-    # Nilai maksimum tegangan (overshoot)
-    overshoot = np.max(Vout) - np.mean(Vout)
+def plot_s_plane(R, C):
+    # Menghitung parameter dalam model orde dua
+    tau = R * C
+    omega = 1 / tau
+    alpha = 1 / (2 * tau)
     
-    # Waktu settling (0.02% dari nilai akhir)
-    settling_threshold = 0.02 * np.max(Vout)
-    settling_time = t[np.argmax(np.abs(Vout - np.max(Vout)) < settling_threshold)]
+    # Menggambar titik-titik pada S-Plane
+    real_part = -alpha
+    imag_part = omega
     
-    # Konstanta waktu (time constant)
-    time_constant = R * C
+    plt.scatter(real_part, imag_part, color='red', marker='x')
+    plt.annotate('(-α, ω)', (-alpha, omega), xytext=(-alpha+0.05, omega+0.1), arrowprops=dict(arrowstyle='->'))
     
-    return overshoot, settling_time, time_constant
+    plt.axhline(0, color='black', linewidth=0.5)
+    plt.axvline(0, color='black', linewidth=0.5)
+    
+    plt.xlabel('Real')
+    plt.ylabel('Imaginary')
+    plt.title('S-Plane RC Pemasak Nasi')
+    plt.grid(True)
+    plt.show()
 
 # Parameter komponen
 R = 100  # Nilai resistor dalam ohm
@@ -40,13 +49,9 @@ Vout = transient_response(R, C, Vin, t)
 plt.plot(t, Vout)
 plt.xlabel('Waktu (s)')
 plt.ylabel('Tegangan Output (V)')
-plt.title('Respon Transient Model Orde Dua')
+plt.title('Respon Transient Model Orde Dua RC Pemasak Nasi')
 plt.grid(True)
 plt.show()
 
-# Menghitung performa
-overshoot, settling_time, time_constant = calculate_performance_metrics(Vout, t)
-
-print(f'Nilai Overshoot: {overshoot}')
-print(f'Waktu Settling: {settling_time}')
-print(f'Konstanta Waktu: {time_constant}')
+# Menggambar grafik S-Plane
+plot_s_plane(R, C)
